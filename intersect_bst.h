@@ -3,7 +3,7 @@
 
 typedef struct Node Node;
 
-Node *getNums(FILE *source);
+Node *getWords(int argc, char *argv[]);
 void printTree(Node *tree);
 
 #endif

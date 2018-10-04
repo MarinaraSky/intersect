@@ -1,77 +1,85 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "intersect_bst.h"
 
-#define BUFF    128
+enum { BUFF = 256 };
 
 typedef struct Node
 {
     struct Node *leftNode;
     struct Node *rightNode;
 
-    int value;
-    unsigned index;
+    char *word;
+	int count;
 } Node;
 
-static Node *newNode(int numToSort);
-static Node *insertNode(Node *input, int num);
+static Node *newNode(char *word);
+static Node *insertNode(Node *input, char *word);
 
 static int curDepth = 0;
 static int maxDepth = 0;
-static int rebalance = 0;
+//static int rebalance = 0;
 
-Node *getNums(FILE *source)
+Node *getWords(int argc, char *argv[])
 {
-    int number;
-    char numToConvert[BUFF];
-    int *nums;
-    int buffSize = BUFF;
-    int isFirst = 0;
     Node *tree = NULL;
-    while(fgets(numToConvert, buffSize, source) != NULL)
-    {
-        number = atoi(numToConvert);
-        if(isFirst == 0)
-        {
-            tree = insertNode(tree, number);                
-            isFirst++;
-        }
-        else
-        {
-            insertNode(tree, number);                       
-        }
-    }
-    fclose(source);
+	for(int i = 1; i <= argc; i++)
+	{
+		FILE *source = fopen(argv[i], "r");
+   		char line[BUFF];
+		char *word;
+	    int buffSize = BUFF;
+	    int isFirst = 0;
+    	while(fgets(line, buffSize, source) != NULL)
+    	{
+			word = strtok(line, " \t\r\n\f\v");
+			while(word)
+			{
+       	 		if(isFirst == 0)
+       	 		{
+           			tree = insertNode(tree, word);                
+           	 		isFirst++;
+        		}
+        		else
+        		{
+           			insertNode(tree, word);                       
+        		}
+				word = strtok(NULL, " \t\r\n\f\v");
+    		}
+		}
+    	fclose(source);
+	}
     return tree;
 }
 
-static int inc = 0;
 
-static Node *newNode(int numToSort)
+static Node *newNode(char *word)
 {
     Node *new = malloc(sizeof(Node));       
-    if(new == NULL)
+    new->word = strdup(word);
+    if(!new || !new->word)
     {
         printf("Error\n");
     }
-    new->value = numToSort;
-    new->index = inc++;
+	new->count = 1;
+
     new->leftNode = new->rightNode = NULL;
-    printf("new Node\n");
-    printf("Node Value: %d\n", new->value);
+    printf("Node Value: %s\n", new->word);
     return new;
 }
 
-static Node *insertNode(Node *tree, int num)
+static Node *insertNode(Node *tree, char *word)
 {
     if(tree == NULL)
     {
-        return newNode(num);    
+        return newNode(word);    
     }       
-    if(tree->value < num)
+    if(strcmp(tree->word, word) < 0)
     {
         printf("right\n");
+		/*
         curDepth++;
         if(tree->rightNode != NULL && tree->rightNode->rightNode != NULL && 
                 tree->rightNode->leftNode == NULL)
@@ -79,7 +87,7 @@ static Node *insertNode(Node *tree, int num)
              rebalance++;
              if(tree->rightNode->rightNode->value < num)
              {
-                int tmp = tree->rightNode->value;
+                char *tmp = tree->rightNode->word;
                 tree->rightNode->value = tree->rightNode->rightNode->value;
                 tree->rightNode->leftNode = tree->rightNode->rightNode;
                 tree->rightNode->rightNode = NULL;
@@ -92,11 +100,13 @@ static Node *insertNode(Node *tree, int num)
                 num = tmp;
              }
          }
-         tree->rightNode = insertNode(tree->rightNode, num);
+		 */
+         tree->rightNode = insertNode(tree->rightNode, word);
     }
-    else
+    else if(strcmp(tree->word, word) > 0)
     {
         printf("left\n");
+		/*
         curDepth++;
         if(tree->leftNode != NULL && tree->leftNode->leftNode != NULL && 
                 tree->leftNode->rightNode == NULL)
@@ -117,8 +127,14 @@ static Node *insertNode(Node *tree, int num)
                 num = tmp;
             }
         }
-        tree->leftNode = insertNode(tree->leftNode, num);
+		*/
+        tree->leftNode = insertNode(tree->leftNode, word);
     }
+	else
+	{
+		tree->count++;
+	}
+	
     if(curDepth > maxDepth)
     {
         maxDepth = curDepth;
@@ -132,7 +148,7 @@ void printTree(Node *tree)
     if(tree != NULL)
     {
         printTree(tree->leftNode);
-        printf("%d\n", tree->value);
+        printf("%s\n", tree->word);
         printTree(tree->rightNode);     
     }       
     free(tree);
