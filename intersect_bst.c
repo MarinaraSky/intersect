@@ -25,7 +25,7 @@ static int maxDepth = 0;
 Node *getWords(int argc, char *argv[])
 {
     Node *tree = NULL;
-	for(int i = 1; i <= argc; i++)
+	for(int i = 1; i < argc; i++)
 	{
 		FILE *source = fopen(argv[i], "r");
    		char line[BUFF];
@@ -148,7 +148,7 @@ void printTree(Node *tree)
     if(tree != NULL)
     {
         printTree(tree->leftNode);
-        printf("%s\n", tree->word);
+        printf("Word: %s Count: %d\n", tree->word, tree->count);
         printTree(tree->rightNode);     
     }       
     free(tree);
