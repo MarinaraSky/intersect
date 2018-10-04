@@ -4,18 +4,16 @@
 
 int main(int argc, char *argv[])
 {
-    FILE *source;
-    if(argc > 1)
+    if(argc > 2)
     {
-        source = fopen(argv[1], "r");   
-        if(source == NULL)
-        {
-            printf("Cannont Find File %s\n", argv[1]);
-        }
-        Node *tree = getNums(source);
+        Node *tree = getWords(argc, argv);
         printTree(tree);
 //        printf("Depth: %d\n", maxDepth);
- //       printf("Rebalance: %d\n", rebalance);
+//        printf("Rebalance: %d\n", rebalance);
     }
+	else
+	{
+		printf("Usage: %s filename1 filename2 [filename 3 ...]\n", argv[0]);
+	}
 }
 
