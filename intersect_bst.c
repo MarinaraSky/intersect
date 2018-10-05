@@ -16,7 +16,7 @@ typedef struct Node
 } Node;
 
 static Node *newNode(char *word);
-static Node *insertNode(Node *input, char *word);
+static Node *insertNode(Node *input, char *word, int file_num);
 
 static int curDepth = 0;
 static int maxDepth = 0;
@@ -39,12 +39,12 @@ Node *getWords(int argc, char *argv[])
 			{
        	 		if(isFirst == 0)
        	 		{
-           			tree = insertNode(tree, word);                
+           			tree = insertNode(tree, word, i);                
            	 		isFirst++;
         		}
         		else
         		{
-           			insertNode(tree, word);                       
+           			insertNode(tree, word, i);                       
         		}
 				word = strtok(NULL, " \t\r\n\f\v");
     		}
@@ -70,13 +70,13 @@ static Node *newNode(char *word)
     return new;
 }
 
-static Node *insertNode(Node *tree, char *word)
+static Node *insertNode(Node *tree, char *word, int file_num)
 {
     if(tree == NULL)
     {
         return newNode(word);    
     }       
-    if(strcmp(tree->word, word) < 0)
+    if(strcasecmp(tree->word, word) < 0)
     {
         printf("right\n");
 		/*
@@ -101,9 +101,9 @@ static Node *insertNode(Node *tree, char *word)
              }
          }
 		 */
-         tree->rightNode = insertNode(tree->rightNode, word);
+         tree->rightNode = insertNode(tree->rightNode, word, file_num);
     }
-    else if(strcmp(tree->word, word) > 0)
+    else if(strcasecmp(tree->word, word) > 0)
     {
         printf("left\n");
 		/*
@@ -128,11 +128,14 @@ static Node *insertNode(Node *tree, char *word)
             }
         }
 		*/
-        tree->leftNode = insertNode(tree->leftNode, word);
+        tree->leftNode = insertNode(tree->leftNode, word, file_num);
     }
 	else
 	{
-		tree->count++;
+		if(tree->count < file_num)
+		{
+			tree->count++;
+		}
 	}
 	
     if(curDepth > maxDepth)
