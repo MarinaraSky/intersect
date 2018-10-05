@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     if(argc > 2)
     {
         Node *tree = getWords(argc, argv);
-        printTree(tree);
+        printTree(tree, argc);
 //        printf("Depth: %d\n", maxDepth);
 //        printf("Rebalance: %d\n", rebalance);
     }
