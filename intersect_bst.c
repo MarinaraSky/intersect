@@ -30,20 +30,15 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 			continue; 
 		}
 		(*files_opened)++;
-   		char line[BUFF];
+   		char *line = calloc(BUFF, 1);
 		char *word;
-	    int buffSize = BUFF;
+	    long unsigned buffSize = BUFF;
 	    int isFirst = 0;
-    	while(fgets(line, buffSize, source) != NULL)
+    	while(getline(&line, &buffSize, source) != -1)
     	{
 			word = strtok(line, " \t\r\n\f\v");
 			while(word)
 			{
-				if(strlen(word) > 256)
-				{
-					fprintf(stderr, "Word to big\n");
-					break;
-				}
        	 		if(isFirst == 0)
        	 		{
            			tree = insertNode(tree, word, *files_opened);                
