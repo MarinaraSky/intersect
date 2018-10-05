@@ -97,7 +97,7 @@ void printTree(Node *tree, int argc)
         printTree(tree->leftNode, argc);
 		if(tree->count == argc - 1)
 		{
-        	printf("Word: %s Count: %d\n", tree->word, tree->count);
+        	printf("%s\n", tree->word);
 		}
         printTree(tree->rightNode, argc);     
     }       
