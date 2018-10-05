@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "intersect_bst.h"
 
-enum { BUFF = 256 };
+enum { BUFF = 258 };
 
 typedef struct Node
 {
@@ -17,10 +17,6 @@ typedef struct Node
 
 static Node *newNode(char *word);
 static Node *insertNode(Node *input, char *word, int file_num);
-
-static int curDepth = 0;
-static int maxDepth = 0;
-//static int rebalance = 0;
 
 Node *getWords(int argc, char *argv[])
 {
@@ -37,6 +33,11 @@ Node *getWords(int argc, char *argv[])
 			word = strtok(line, " \t\r\n\f\v");
 			while(word)
 			{
+				if(strlen(word) > 256)
+				{
+					fprintf(stderr, "Word to big\n");
+					break;
+				}
        	 		if(isFirst == 0)
        	 		{
            			tree = insertNode(tree, word, i);                
@@ -69,6 +70,7 @@ static Node *newNode(char *word)
     return new;
 }
 
+
 static Node *insertNode(Node *tree, char *word, int file_num)
 {
     if(tree == NULL)
@@ -77,54 +79,10 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     }       
     if(strcasecmp(tree->word, word) < 0)
     {
-		/*
-        curDepth++;
-        if(tree->rightNode != NULL && tree->rightNode->rightNode != NULL && 
-                tree->rightNode->leftNode == NULL)
-         {
-             rebalance++;
-             if(tree->rightNode->rightNode->value < num)
-             {
-                char *tmp = tree->rightNode->word;
-                tree->rightNode->value = tree->rightNode->rightNode->value;
-                tree->rightNode->leftNode = tree->rightNode->rightNode;
-                tree->rightNode->rightNode = NULL;
-                tree->rightNode->leftNode->value = tmp; 
-             }
-             else
-             {
-                int tmp = tree->rightNode->value;
-                tree->rightNode->value = num;
-                num = tmp;
-             }
-         }
-		 */
          tree->rightNode = insertNode(tree->rightNode, word, file_num);
     }
     else if(strcasecmp(tree->word, word) > 0)
     {
-		/*
-        curDepth++;
-        if(tree->leftNode != NULL && tree->leftNode->leftNode != NULL && 
-                tree->leftNode->rightNode == NULL)
-        {
-            rebalance++;
-            if(tree->leftNode->leftNode->value > num)
-            {
-                int tmp = tree->leftNode->value;
-                tree->leftNode->value = tree->leftNode->leftNode->value;
-                tree->leftNode->rightNode = tree->leftNode->leftNode;
-                tree->leftNode->leftNode = NULL;
-                tree->leftNode->rightNode->value = tmp;
-            }
-            else
-            {
-                int tmp = tree->leftNode->value;
-                tree->leftNode->value = num;
-                num = tmp;
-            }
-        }
-		*/
         tree->leftNode = insertNode(tree->leftNode, word, file_num);
     }
 	else
@@ -134,12 +92,6 @@ static Node *insertNode(Node *tree, char *word, int file_num)
 			tree->count++;
 		}
 	}
-	
-    if(curDepth > maxDepth)
-    {
-        maxDepth = curDepth;
-    }       
-    curDepth = 0;
     return tree;    
 }
 
@@ -150,7 +102,7 @@ void printTree(Node *tree, int argc)
         printTree(tree->leftNode, argc);
 		if(tree->count == argc - 1)
 		{
-        	printf("Word: %s Count: %d\n", tree->word, tree->count);
+        	printf("%s\n", tree->word);
 		}
         printTree(tree->rightNode, argc);     
     }       
