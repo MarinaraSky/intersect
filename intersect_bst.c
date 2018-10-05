@@ -74,6 +74,7 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 				word = strtok(NULL, " \t\r\n\f\v");
     		}
 		}
+		free(line);
     	fclose(source);
 	}
     return tree;
