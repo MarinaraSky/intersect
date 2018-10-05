@@ -154,5 +154,15 @@ void printTree(Node *tree, int argc)
 		}
         printTree(tree->rightNode, argc);     
     }       
-    free(tree);
+}
+
+void destroyTree(Node *tree)
+{
+    if(tree != NULL)
+    {
+        destroyTree(tree->leftNode);
+		free(tree->word);
+        destroyTree(tree->rightNode);     
+		free(tree);
+    }       
 }
