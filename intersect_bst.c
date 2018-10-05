@@ -66,7 +66,6 @@ static Node *newNode(char *word)
 	new->count = 1;
 
     new->leftNode = new->rightNode = NULL;
-    printf("Node Value: %s\n", new->word);
     return new;
 }
 
@@ -78,7 +77,6 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     }       
     if(strcasecmp(tree->word, word) < 0)
     {
-        printf("right\n");
 		/*
         curDepth++;
         if(tree->rightNode != NULL && tree->rightNode->rightNode != NULL && 
@@ -105,7 +103,6 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     }
     else if(strcasecmp(tree->word, word) > 0)
     {
-        printf("left\n");
 		/*
         curDepth++;
         if(tree->leftNode != NULL && tree->leftNode->leftNode != NULL && 
