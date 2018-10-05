@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +48,20 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 			word = strtok(line, " \t\r\n\f\v");
 			while(word)
 			{
+				for(unsigned j = strlen(word); j > 0; j--)
+				{
+					if(ispunct(word[j]) != 0)
+					{
+						word[j] = 0;
+					}
+				}
+				for(unsigned j = 0; j < strlen(word); j++)
+				{
+					if(ispunct(word[j]) != 0)
+					{
+						word++;
+					}
+				}
        	 		if(isFirst == 0)
        	 		{
            			tree = insertNode(tree, word, *files_opened);     
