@@ -102,9 +102,9 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     }
 	else
 	{
-		if(file_num != 1 && tree->count < file_num)
+		if(file_num != 1 && tree->count == file_num - 1)
 		{
-			tree->count++;
+			tree->count = file_num;
 		}
 	}
     return tree;    
