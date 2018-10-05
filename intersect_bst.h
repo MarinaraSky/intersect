@@ -4,6 +4,6 @@
 typedef struct Node Node;
 
 Node *getWords(int argc, char *argv[]);
-void printTree(Node *tree);
+void printTree(Node *tree, int argc);
 
 #endif
