@@ -79,7 +79,14 @@ static Node *insertNode(Node *tree, char *word, int file_num)
 {
     if(tree == NULL)
     {
-        return newNode(word);    
+		if(file_num == 1)
+		{
+        	return newNode(word);    
+		}
+		else
+		{
+			return tree;
+		}
     }       
     if(strcasecmp(tree->word, word) < 0)
     {
