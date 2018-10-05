@@ -23,10 +23,18 @@ Node *getWords(int *files_opened, int argc, char *argv[])
     Node *tree = NULL;
 	for(int i = 1; i < argc; i++)
 	{
-		FILE *source = fopen(argv[i], "r");
+		FILE *source;
+		if(i == 1 && strcmp(argv[i], "-") == 0)
+		{
+			source = stdin;	
+		}
+		else
+		{
+			source = fopen(argv[i], "r");
+		}
 		if(!source)
 		{
-			fprintf(stderr, "File can't be opened.\n");
+			fprintf(stderr, "%s can't be opened.\n", argv[i]);
 			continue; 
 		}
 		(*files_opened)++;
@@ -41,12 +49,12 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 			{
        	 		if(isFirst == 0)
        	 		{
-           			tree = insertNode(tree, word, *files_opened);                
+           			tree = insertNode(tree, word, *files_opened);     
            	 		isFirst++;
         		}
         		else
         		{
-           			insertNode(tree, word, *files_opened);                       
+           			insertNode(tree, word, *files_opened);     
         		}
 				word = strtok(NULL, " \t\r\n\f\v");
     		}
