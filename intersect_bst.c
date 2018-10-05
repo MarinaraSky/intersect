@@ -48,28 +48,6 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 			word = strtok(line, " \t\r\n\f\v");
 			while(word)
 			{
-				for(unsigned j = strlen(word) - 1; j > 0; j--)
-				{
-					if(ispunct(word[j]) != 0)
-					{
-						word[j] = 0;
-					}
-					else
-					{
-						break;
-					}
-				}
-				for(unsigned j = 0; j < strlen(word); j++)
-				{
-					if(ispunct(word[j]) != 0)
-					{
-						word++;
-					}
-					else
-					{
-						break;
-					}
-				}
        	 		if(isFirst == 0)
        	 		{
            			tree = insertNode(tree, word, *files_opened);     
@@ -116,11 +94,12 @@ static Node *insertNode(Node *tree, char *word, int file_num)
 			return tree;
 		}
     }       
-    if(strcasecmp(tree->word, word) < 0)
+	int compare = ignorePuncCmp(tree->word, word);
+    if(compare < 0)
     {
-         tree->rightNode = insertNode(tree->rightNode, word, file_num);
+    	tree->rightNode = insertNode(tree->rightNode, word, file_num);
     }
-    else if(strcasecmp(tree->word, word) > 0)
+    else if(compare > 0)
     {
         tree->leftNode = insertNode(tree->leftNode, word, file_num);
     }
@@ -130,6 +109,7 @@ static Node *insertNode(Node *tree, char *word, int file_num)
 		{
 			tree->count = file_num;
 		}
+
 	}
     return tree;    
 }
@@ -156,4 +136,34 @@ void destroyTree(Node *tree)
         destroyTree(tree->rightNode);     
 		free(tree);
     }       
+}
+
+int ignorePuncCmp(const char *tree_word, const char *word)
+{
+	int return_code = 0;
+	char *tmp_a = calloc(strlen(tree_word) + 1, 1);
+	char *tmp_b = calloc(strlen(word) + 1, 1);
+	int i = 0;
+	for(unsigned j = 0; j < strlen(tree_word); j++)
+	{
+		if(ispunct(tree_word[j]) == 0)
+		{
+			tmp_a[i] = tree_word[j];
+			i++;
+		}
+	}
+	i = 0;	
+	for(unsigned j = 0; j < strlen(word); j++)
+	{
+		if(ispunct(word[j]) == 0)
+		{
+			tmp_b[i] = word[j];
+			i++;
+		}
+	}
+	return_code = strcasecmp(tmp_a, tmp_b);
+	free(tmp_a);
+	free(tmp_b);
+		
+	return return_code;
 }
