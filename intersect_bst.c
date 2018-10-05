@@ -48,11 +48,15 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 			word = strtok(line, " \t\r\n\f\v");
 			while(word)
 			{
-				for(unsigned j = strlen(word); j > 0; j--)
+				for(unsigned j = strlen(word) - 1; j > 0; j--)
 				{
 					if(ispunct(word[j]) != 0)
 					{
 						word[j] = 0;
+					}
+					else
+					{
+						break;
 					}
 				}
 				for(unsigned j = 0; j < strlen(word); j++)
@@ -60,6 +64,10 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 					if(ispunct(word[j]) != 0)
 					{
 						word++;
+					}
+					else
+					{
+						break;
 					}
 				}
        	 		if(isFirst == 0)
