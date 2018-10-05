@@ -61,7 +61,6 @@ Node *getWords(int *files_opened, int argc, char *argv[])
     return tree;
 }
 
-
 static Node *newNode(char *word)
 {
     Node *new = malloc(sizeof(Node));       
@@ -75,7 +74,6 @@ static Node *newNode(char *word)
     new->leftNode = new->rightNode = NULL;
     return new;
 }
-
 
 static Node *insertNode(Node *tree, char *word, int file_num)
 {
@@ -93,7 +91,7 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     }
 	else
 	{
-		if(tree->count < file_num)
+		if(file_num != 1 && tree->count < file_num)
 		{
 			tree->count++;
 		}
