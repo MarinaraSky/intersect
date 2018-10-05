@@ -63,6 +63,7 @@ static Node *newNode(char *word)
     if(!new || !new->word)
     {
         printf("Error\n");
+		return NULL;
     }
 	new->count = 1;
 
@@ -106,7 +107,7 @@ void printTree(Node *tree, int files_opened)
     if(tree != NULL)
     {
         printTree(tree->leftNode, files_opened);
-		if(tree->count == files_opened)
+		if(files_opened != 1 && tree->count == files_opened)
 		{
         	printf("%s\n", tree->word);
 		}
