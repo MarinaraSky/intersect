@@ -1,6 +1,6 @@
 CC = gcc
 PROGRAMS = intersect
-CFLAGS = $(CF) -Wall -Wextra -Wpedantic 
+CFLAGS = $(CF) -Wall -Wextra -Wpedantic -Wstack-usage=256
 DEBUG_FLAGS = -g
 PROFILE_FLAGS = -pg
 

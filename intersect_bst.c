@@ -30,20 +30,15 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 			continue; 
 		}
 		(*files_opened)++;
-   		char line[BUFF];
+   		char *line = calloc(BUFF, 1);
 		char *word;
-	    int buffSize = BUFF;
+	    long unsigned buffSize = BUFF;
 	    int isFirst = 0;
-    	while(fgets(line, buffSize, source) != NULL)
+    	while(getline(&line, &buffSize, source) != -1)
     	{
 			word = strtok(line, " \t\r\n\f\v");
 			while(word)
 			{
-				if(strlen(word) > 256)
-				{
-					fprintf(stderr, "Word to big\n");
-					break;
-				}
        	 		if(isFirst == 0)
        	 		{
            			tree = insertNode(tree, word, *files_opened);                
@@ -61,7 +56,6 @@ Node *getWords(int *files_opened, int argc, char *argv[])
     return tree;
 }
 
-
 static Node *newNode(char *word)
 {
     Node *new = malloc(sizeof(Node));       
@@ -69,6 +63,7 @@ static Node *newNode(char *word)
     if(!new || !new->word)
     {
         printf("Error\n");
+		return NULL;
     }
 	new->count = 1;
 
@@ -76,12 +71,18 @@ static Node *newNode(char *word)
     return new;
 }
 
-
 static Node *insertNode(Node *tree, char *word, int file_num)
 {
     if(tree == NULL)
     {
-        return newNode(word);    
+		if(file_num == 1)
+		{
+        	return newNode(word);    
+		}
+		else
+		{
+			return tree;
+		}
     }       
     if(strcasecmp(tree->word, word) < 0)
     {
@@ -93,7 +94,7 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     }
 	else
 	{
-		if(tree->count < file_num)
+		if(file_num != 1 && tree->count < file_num)
 		{
 			tree->count++;
 		}
@@ -106,7 +107,7 @@ void printTree(Node *tree, int files_opened)
     if(tree != NULL)
     {
         printTree(tree->leftNode, files_opened);
-		if(tree->count == files_opened)
+		if(files_opened != 1 && tree->count == files_opened)
 		{
         	printf("%s\n", tree->word);
 		}
