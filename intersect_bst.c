@@ -146,13 +146,16 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     return tree;    
 }
 
-void printTree(Node *tree)
+void printTree(Node *tree, int argc)
 {
     if(tree != NULL)
     {
-        printTree(tree->leftNode);
-        printf("Word: %s Count: %d\n", tree->word, tree->count);
-        printTree(tree->rightNode);     
+        printTree(tree->leftNode, argc);
+		if(tree->count == argc - 1)
+		{
+        	printf("Word: %s Count: %d\n", tree->word, tree->count);
+		}
+        printTree(tree->rightNode, argc);     
     }       
     free(tree);
 }
