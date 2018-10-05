@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "intersect_bst.h"
 
-enum { BUFF = 256 };
+enum { BUFF = 258 };
 
 typedef struct Node
 {
@@ -33,6 +33,11 @@ Node *getWords(int argc, char *argv[])
 			word = strtok(line, " \t\r\n\f\v");
 			while(word)
 			{
+				if(strlen(word) > 256)
+				{
+					fprintf(stderr, "Word to big\n");
+					break;
+				}
        	 		if(isFirst == 0)
        	 		{
            			tree = insertNode(tree, word, i);                
