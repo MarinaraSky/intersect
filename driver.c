@@ -6,8 +6,9 @@ int main(int argc, char *argv[])
 {
     if(argc > 2)
     {
-        Node *tree = getWords(argc, argv);
-        printTree(tree, argc);
+		int files_opened = 0;
+        Node *tree = getWords(&files_opened, argc, argv);
+        printTree(tree, files_opened);
 		destroyTree(tree);
     }
 	else
