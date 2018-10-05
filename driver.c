@@ -9,8 +9,6 @@ int main(int argc, char *argv[])
         Node *tree = getWords(argc, argv);
         printTree(tree, argc);
 		destroyTree(tree);
-//        printf("Depth: %d\n", maxDepth);
-//        printf("Rebalance: %d\n", rebalance);
     }
 	else
 	{
