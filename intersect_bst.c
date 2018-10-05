@@ -18,12 +18,18 @@ typedef struct Node
 static Node *newNode(char *word);
 static Node *insertNode(Node *input, char *word, int file_num);
 
-Node *getWords(int argc, char *argv[])
+Node *getWords(int *files_opened, int argc, char *argv[])
 {
     Node *tree = NULL;
 	for(int i = 1; i < argc; i++)
 	{
 		FILE *source = fopen(argv[i], "r");
+		if(!source)
+		{
+			fprintf(stderr, "File can't be opened.\n");
+			continue; 
+		}
+		(*files_opened)++;
    		char line[BUFF];
 		char *word;
 	    int buffSize = BUFF;
@@ -40,12 +46,12 @@ Node *getWords(int argc, char *argv[])
 				}
        	 		if(isFirst == 0)
        	 		{
-           			tree = insertNode(tree, word, i);                
+           			tree = insertNode(tree, word, *files_opened);                
            	 		isFirst++;
         		}
         		else
         		{
-           			insertNode(tree, word, i);                       
+           			insertNode(tree, word, *files_opened);                       
         		}
 				word = strtok(NULL, " \t\r\n\f\v");
     		}
@@ -95,16 +101,16 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     return tree;    
 }
 
-void printTree(Node *tree, int argc)
+void printTree(Node *tree, int files_opened)
 {
     if(tree != NULL)
     {
-        printTree(tree->leftNode, argc);
-		if(tree->count == argc - 1)
+        printTree(tree->leftNode, files_opened);
+		if(tree->count == files_opened)
 		{
         	printf("%s\n", tree->word);
 		}
-        printTree(tree->rightNode, argc);     
+        printTree(tree->rightNode, files_opened);     
     }       
 }
 
