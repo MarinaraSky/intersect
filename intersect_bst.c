@@ -184,7 +184,7 @@ void stripPunct(const char *word, char *tmp, bool *symbols)
 	}
 	start = j;
 	j = end;
-	while(isalpha(word[j]) == 0)
+	while(j >= 0 && isalpha(word[j]) == 0)
 	{
 		j--;
 	}
