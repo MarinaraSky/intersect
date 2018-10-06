@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include "intersect_bst.h"
 
@@ -141,18 +142,13 @@ void destroyTree(Node *tree)
 int ignorePuncCmp(const char *tree_word, const char *word)
 {
 	int return_code = 0;
+	int letter = 0;
+	bool symbols = false;
 	char *tmp_a = calloc(strlen(tree_word) + 1, 1);
 	char *tmp_b = calloc(strlen(word) + 1, 1);
-	int i = 0;
-	for(unsigned j = 0; j < strlen(tree_word); j++)
-	{
-		if(ispunct(tree_word[j]) == 0)
-		{
-			tmp_a[i] = tree_word[j];
-			i++;
-		}
-	}
-	i = 0;	
+	stripPunct(tree_word, tmp_a, &symbols);
+	stripPunct(word, tmp_b, &symbols);
+	/*
 	for(unsigned j = 0; j < strlen(word); j++)
 	{
 		if(ispunct(word[j]) == 0)
@@ -160,10 +156,46 @@ int ignorePuncCmp(const char *tree_word, const char *word)
 			tmp_b[i] = word[j];
 			i++;
 		}
+		if(isalpha(word[j] != 0))
+		{	
+			letter++;
+		}	
 	}
+	*/
 	return_code = strcasecmp(tmp_a, tmp_b);
+	if(symbols == true)
+	{
+		return_code = -1;
+	}
 	free(tmp_a);
 	free(tmp_b);
 		
 	return return_code;
+}
+
+void stripPunct(const char *word, char *tmp, bool *symbols)
+{
+	int start = 0;
+	int end = strlen(word);
+	int j = 0;
+	while(ispunct(word[j]) != 0)
+	{
+		j++;
+	}
+	start = j;
+	j = end;
+	while(isalpha(word[j]) == 0)
+	{
+		j--;
+	}
+	end = j;
+	if(end - start < 0)
+	{
+		*symbols = true;
+	}
+	for(int i = 0; start <= end; i++)
+	{
+		tmp[i] = word[start++];	
+	}
+
 }
