@@ -142,26 +142,16 @@ void destroyTree(Node *tree)
 int ignorePuncCmp(const char *tree_word, const char *word)
 {
 	int return_code = 0;
-	int letter = 0;
 	bool symbols = false;
 	char *tmp_a = calloc(strlen(tree_word) + 1, 1);
 	char *tmp_b = calloc(strlen(word) + 1, 1);
+	if(tmp_a == NULL || tmp_b == NULL)
+	{
+		fprintf(stderr, "Unable to allocate memory.\n");
+		return -1;
+	}
 	stripPunct(tree_word, tmp_a, &symbols);
 	stripPunct(word, tmp_b, &symbols);
-	/*
-	for(unsigned j = 0; j < strlen(word); j++)
-	{
-		if(ispunct(word[j]) == 0)
-		{
-			tmp_b[i] = word[j];
-			i++;
-		}
-		if(isalpha(word[j] != 0))
-		{	
-			letter++;
-		}	
-	}
-	*/
 	return_code = strcasecmp(tmp_a, tmp_b);
 	if(symbols == true)
 	{
