@@ -6,186 +6,233 @@
 #include <unistd.h>
 #include "intersect_bst.h"
 
-enum { BUFF = 258 };
+/* Used for reading in files, gets resized as needed */
+enum
+{ BUFF = 258 };
 
 typedef struct Node
 {
-    struct Node *leftNode;
-    struct Node *rightNode;
+    struct Node    *leftNode;
+    struct Node    *rightNode;
 
-    char *word;
-	int count;
+    char           *word;
+    int             count;
 } Node;
 
-static Node *newNode(char *word);
-static Node *insertNode(Node *input, char *word, int file_num);
+/* Creates node in BST from word */
+static Node    *newNode(
+    char *word);
 
-Node *getWords(int *files_opened, int argc, char *argv[])
+/* Sorting function to determine location of new node */
+static Node    *insertNode(
+    Node * input,
+    char *word,
+    int file_num);
+
+Node           *
+getWords(
+    int *files_opened,
+    int argc,
+    char *argv[])
 {
-    Node *tree = NULL;
-	for(int i = 1; i < argc; i++)
-	{
-		FILE *source;
-		if(i == 1 && strcmp(argv[i], "-") == 0)
-		{
-			source = stdin;	
-		}
-		else
-		{
-			source = fopen(argv[i], "r");
-		}
-		if(!source)
-		{
-			fprintf(stderr, "%s can't be opened.\n", argv[i]);
-			continue; 
-		}
-		(*files_opened)++;
-   		char *line = calloc(BUFF, 1);
-		char *word;
-	    long unsigned buffSize = BUFF;
-	    int isFirst = 0;
-    	while(getline(&line, &buffSize, source) != -1)
-    	{
-			word = strtok(line, " \t\r\n\f\v");
-			while(word)
-			{
-       	 		if(isFirst == 0)
-       	 		{
-           			tree = insertNode(tree, word, *files_opened);     
-           	 		isFirst++;
-        		}
-        		else
-        		{
-           			insertNode(tree, word, *files_opened);     
-        		}
-				word = strtok(NULL, " \t\r\n\f\v");
-    		}
-		}
-		free(line);
-    	fclose(source);
-	}
+    Node           *tree = NULL;
+
+    for (int i = 1; i < argc; i++)
+    {
+        FILE           *source;
+
+        /* Check for stdin flag */
+        if (i == 1 && strcmp(argv[i], "-") == 0)
+        {
+            source = stdin;
+        }
+        else
+        {
+            source = fopen(argv[i], "r");
+        }
+        if (!source)
+        {
+            fprintf(stderr, "%s can't be opened.\n", argv[i]);
+            continue;
+        }
+        /* Used to keep uniqueness of words */
+        (*files_opened)++;
+        char           *line = calloc(BUFF, 1);
+        char           *word;
+        long unsigned   buffSize = BUFF;
+        int             isFirst = 0;
+
+        while (getline(&line, &buffSize, source) != -1)
+        {
+            word = strtok(line, " \t\r\n\f\v");
+            while (word)
+            {
+                if (isFirst == 0)
+                {
+                    tree = insertNode(tree, word, *files_opened);
+                    isFirst++;
+                }
+                else
+                {
+                    insertNode(tree, word, *files_opened);
+                }
+                word = strtok(NULL, " \t\r\n\f\v");
+            }
+        }
+        free(line);
+        fclose(source);
+    }
     return tree;
 }
 
-static Node *newNode(char *word)
+static Node    *
+newNode(
+    char *word)
 {
-    Node *new = malloc(sizeof(Node));       
+    Node           *new = malloc(sizeof(Node));
+
     new->word = strdup(word);
-    if(!new || !new->word)
+    if (!new || !new->word)
     {
         printf("Error\n");
-		return NULL;
+        return NULL;
     }
-	new->count = 1;
+    new->count = 1;
 
     new->leftNode = new->rightNode = NULL;
     return new;
 }
 
-static Node *insertNode(Node *tree, char *word, int file_num)
+static Node    *
+insertNode(
+    Node * tree,
+    char *word,
+    int file_num)
 {
-    if(tree == NULL)
+    if (tree == NULL)
     {
-		if(file_num == 1)
-		{
-        	return newNode(word);    
-		}
-		else
-		{
-			return tree;
-		}
-    }       
-	int compare = ignorePuncCmp(tree->word, word);
-    if(compare < 0)
-    {
-    	tree->rightNode = insertNode(tree->rightNode, word, file_num);
+        if (file_num == 1)
+        {
+            return newNode(word);
+        }
+        else
+        {
+            return tree;
+        }
     }
-    else if(compare > 0)
+    int             compare = ignorePuncCmp(tree->word, word);
+
+    if (compare < 0)
+    {
+        tree->rightNode = insertNode(tree->rightNode, word, file_num);
+    }
+    else if (compare > 0)
     {
         tree->leftNode = insertNode(tree->leftNode, word, file_num);
     }
-	else
-	{
-		if(file_num != 1 && tree->count == file_num - 1)
-		{
-			tree->count = file_num;
-		}
+    else
+    {
+        /* Will not update if word was not found in previous file */
+        if (file_num != 1 && tree->count == file_num - 1)
+        {
+            tree->count = file_num;
+        }
 
-	}
-    return tree;    
+    }
+    return tree;
 }
 
-void printTree(Node *tree, int files_opened)
+void
+printTree(
+    Node * tree,
+    int files_opened)
 {
-    if(tree != NULL)
+    if (tree != NULL)
     {
         printTree(tree->leftNode, files_opened);
-		if(files_opened != 1 && tree->count == files_opened)
-		{
-        	printf("%s\n", tree->word);
-		}
-        printTree(tree->rightNode, files_opened);     
-    }       
+        if (files_opened != 1 && tree->count == files_opened)
+        {
+            printf("%s\n", tree->word);
+        }
+        printTree(tree->rightNode, files_opened);
+    }
 }
 
-void destroyTree(Node *tree)
+void
+destroyTree(
+    Node * tree)
 {
-    if(tree != NULL)
+    if (tree != NULL)
     {
         destroyTree(tree->leftNode);
-		free(tree->word);
-        destroyTree(tree->rightNode);     
-		free(tree);
-    }       
+        free(tree->word);
+        destroyTree(tree->rightNode);
+        free(tree);
+    }
 }
 
-int ignorePuncCmp(const char *tree_word, const char *word)
+int
+ignorePuncCmp(
+    const char *tree_word,
+    const char *word)
 {
-	int return_code = 0;
-	bool symbols = false;
-	char *tmp_a = calloc(strlen(tree_word) + 1, 1);
-	char *tmp_b = calloc(strlen(word) + 1, 1);
-	if(tmp_a == NULL || tmp_b == NULL)
-	{
-		fprintf(stderr, "Unable to allocate memory.\n");
-		return -1;
-	}
-	stripPunct(tree_word, tmp_a, &symbols);
-	stripPunct(word, tmp_b, &symbols);
-	return_code = strcasecmp(tmp_a, tmp_b);
-	if(symbols == true)
-	{
-		return_code = -1;
-	}
-	free(tmp_a);
-	free(tmp_b);
-		
-	return return_code;
+    int             return_code = 0;
+
+    /* Used if the word is only symbols */
+    bool            symbols = false;
+    char           *tmp_a = calloc(strlen(tree_word) + 1, 1);
+    char           *tmp_b = calloc(strlen(word) + 1, 1);
+
+    if (tmp_a == NULL || tmp_b == NULL)
+    {
+        fprintf(stderr, "Unable to allocate memory.\n");
+        return -1;
+    }
+    stripPunct(tree_word, tmp_a, &symbols);
+    stripPunct(word, tmp_b, &symbols);
+    /* Handles UTF8 sorting as well as case insensitivity */
+    return_code = strcasecmp(tmp_a, tmp_b);
+    if (symbols == true)
+    {
+        return_code = -1;
+    }
+    free(tmp_a);
+    free(tmp_b);
+
+    return return_code;
 }
 
-void stripPunct(const char *word, char *tmp, bool *symbols)
+void
+stripPunct(
+    const char *word,
+    char *tmp,
+    bool * symbols)
 {
-	int start = 0;
-	int end = strlen(word);
-	int j = 0;
-	while(ispunct(word[j]) != 0)
-	{
-		j++;
-	}
-	start = j;
-	j = end;
-	while(j >= 0 && isalpha(word[j]) == 0)
-	{
-		j--;
-	}
-	end = j;
-	if(end - start < 0)
-	{
-		*symbols = true;
-	}
-	for(int i = 0; start <= end; i++)
-	{
-		tmp[i] = word[start++];	
-	}
+    int             start = 0;
+    int             end = strlen(word);
+    int             j = 0;
+
+    /* Locates the first letter in the word */
+    while (ispunct(word[j]) != 0)
+    {
+        j++;
+    }
+    start = j;
+    j = end;
+    /* Locates the last letter in the word */
+    while (j >= 0 && isalpha(word[j]) == 0)
+    {
+        j--;
+    }
+    end = j;
+    if (end - start < 0)
+    {
+        *symbols = true;
+    }
+    /* Copies the letters between the two values found */
+    for (int i = 0; start <= end; i++)
+    {
+        tmp[i] = word[start++];
+    }
 
 }
