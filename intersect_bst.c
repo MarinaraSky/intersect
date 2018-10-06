@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "intersect_bst.h"
 
+/* Used for reading in files, gets resized as needed */
 enum { BUFF = 258 };
 
 typedef struct Node
@@ -17,7 +18,9 @@ typedef struct Node
 	int count;
 } Node;
 
+/* Creates node in BST from word */
 static Node *newNode(char *word);
+/* Sorting function to determine location of new node */
 static Node *insertNode(Node *input, char *word, int file_num);
 
 Node *getWords(int *files_opened, int argc, char *argv[])
@@ -26,6 +29,7 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 	for(int i = 1; i < argc; i++)
 	{
 		FILE *source;
+		/* Check for stdin flag */
 		if(i == 1 && strcmp(argv[i], "-") == 0)
 		{
 			source = stdin;	
@@ -39,6 +43,7 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 			fprintf(stderr, "%s can't be opened.\n", argv[i]);
 			continue; 
 		}
+		/* Used to keep uniqueness of words */
 		(*files_opened)++;
    		char *line = calloc(BUFF, 1);
 		char *word;
@@ -106,6 +111,7 @@ static Node *insertNode(Node *tree, char *word, int file_num)
     }
 	else
 	{
+		/* Will not update if word was not found in previous file */
 		if(file_num != 1 && tree->count == file_num - 1)
 		{
 			tree->count = file_num;
@@ -142,6 +148,7 @@ void destroyTree(Node *tree)
 int ignorePuncCmp(const char *tree_word, const char *word)
 {
 	int return_code = 0;
+	/* Used if the word is only symbols */
 	bool symbols = false;
 	char *tmp_a = calloc(strlen(tree_word) + 1, 1);
 	char *tmp_b = calloc(strlen(word) + 1, 1);
@@ -152,6 +159,7 @@ int ignorePuncCmp(const char *tree_word, const char *word)
 	}
 	stripPunct(tree_word, tmp_a, &symbols);
 	stripPunct(word, tmp_b, &symbols);
+	/* Handles UTF8 sorting as well as case insensitivity */
 	return_code = strcasecmp(tmp_a, tmp_b);
 	if(symbols == true)
 	{
@@ -168,12 +176,14 @@ void stripPunct(const char *word, char *tmp, bool *symbols)
 	int start = 0;
 	int end = strlen(word);
 	int j = 0;
+	/* Locates the first letter in the word */
 	while(ispunct(word[j]) != 0)
 	{
 		j++;
 	}
 	start = j;
 	j = end;
+	/* Locates the last letter in the word */
 	while(j >= 0 && isalpha(word[j]) == 0)
 	{
 		j--;
@@ -183,6 +193,7 @@ void stripPunct(const char *word, char *tmp, bool *symbols)
 	{
 		*symbols = true;
 	}
+	/* Copies the letters between the two values found */
 	for(int i = 0; start <= end; i++)
 	{
 		tmp[i] = word[start++];	
