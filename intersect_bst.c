@@ -1,6 +1,8 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include "intersect_bst.h"
 
@@ -59,6 +61,7 @@ Node *getWords(int *files_opened, int argc, char *argv[])
 				word = strtok(NULL, " \t\r\n\f\v");
     		}
 		}
+		free(line);
     	fclose(source);
 	}
     return tree;
@@ -92,11 +95,12 @@ static Node *insertNode(Node *tree, char *word, int file_num)
 			return tree;
 		}
     }       
-    if(strcasecmp(tree->word, word) < 0)
+	int compare = ignorePuncCmp(tree->word, word);
+    if(compare < 0)
     {
-         tree->rightNode = insertNode(tree->rightNode, word, file_num);
+    	tree->rightNode = insertNode(tree->rightNode, word, file_num);
     }
-    else if(strcasecmp(tree->word, word) > 0)
+    else if(compare > 0)
     {
         tree->leftNode = insertNode(tree->leftNode, word, file_num);
     }
@@ -106,6 +110,7 @@ static Node *insertNode(Node *tree, char *word, int file_num)
 		{
 			tree->count = file_num;
 		}
+
 	}
     return tree;    
 }
@@ -132,4 +137,65 @@ void destroyTree(Node *tree)
         destroyTree(tree->rightNode);     
 		free(tree);
     }       
+}
+
+int ignorePuncCmp(const char *tree_word, const char *word)
+{
+	int return_code = 0;
+	int letter = 0;
+	bool symbols = false;
+	char *tmp_a = calloc(strlen(tree_word) + 1, 1);
+	char *tmp_b = calloc(strlen(word) + 1, 1);
+	stripPunct(tree_word, tmp_a, &symbols);
+	stripPunct(word, tmp_b, &symbols);
+	/*
+	for(unsigned j = 0; j < strlen(word); j++)
+	{
+		if(ispunct(word[j]) == 0)
+		{
+			tmp_b[i] = word[j];
+			i++;
+		}
+		if(isalpha(word[j] != 0))
+		{	
+			letter++;
+		}	
+	}
+	*/
+	return_code = strcasecmp(tmp_a, tmp_b);
+	if(symbols == true)
+	{
+		return_code = -1;
+	}
+	free(tmp_a);
+	free(tmp_b);
+		
+	return return_code;
+}
+
+void stripPunct(const char *word, char *tmp, bool *symbols)
+{
+	int start = 0;
+	int end = strlen(word);
+	int j = 0;
+	while(ispunct(word[j]) != 0)
+	{
+		j++;
+	}
+	start = j;
+	j = end;
+	while(isalpha(word[j]) == 0)
+	{
+		j--;
+	}
+	end = j;
+	if(end - start < 0)
+	{
+		*symbols = true;
+	}
+	for(int i = 0; start <= end; i++)
+	{
+		tmp[i] = word[start++];	
+	}
+
 }
